@@ -5,7 +5,7 @@ const servidor = express();
 
 servidor.get("/",(solicitud, respuesta)=>{
     respuesta.json({
-        saludo:"hola"
+        saludo:"hola como estas?"
     })
 });
 servidor.listen(3000);
