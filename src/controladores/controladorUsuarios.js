@@ -1,69 +1,102 @@
-// creamos una contanste a la que le pasamos una funcion que va a crear leer actualizar e iliminar estas funciones no las traimos de ruta usuarios
+import ModeloUsuario from "../modelos/modeloUsuario.js";
+
 const ControladorUsuarios = {
-    crearUsuario: async(solicitud, respuesta) => {
+    crearUsuario: async (solicitud, respuesta) => {
+      try {
+        const nuevoUsuario = new ModeloUsuario(solicitud.body);
+        const usuarioCreado = await nuevoUsuario.save();
+        if (usuarioCreado._id) {
+          respuesta.json({
+            resultado: "bien",
+            mensaje: "usuario creado",
+            datos: usuarioCreado._id
+          });
+        }
+      } catch (error) {
+        respuesta.json({
+          resultado: "mal",
+          mensaje: "ocurrió un error al crear usuario",
+          datos: error
+        });
+      }
+      },
+      leerUsuario: async (solicitud, respuesta) => {
         try {
-      console.log("solicitud:",solicitud.body); // aqui se crea la solicitud para traer de postman el apartado body para que no salga undefault se debe colocar en servidor .use (express.json())asi acepta los datos de postman q estan en formato json 
-       if (solicitud.body.nombre==="")throw new Error ("falta el nombre");// para verificar errores 
-       if (solicitud.body.edad==="")throw new Error ("falta la edad");
-       if (solicitud.body.correo==="")throw new Error ("ingrese correo");
-       respuesta.json({mensaje:"Post crear usuario ...works!"});
-      }catch (error){
-        respuesta.json({error:true, mensaje:"ocurrio un error al crear usuario"});
+          const usuarioEncontrado = await ModeloUsuario.findById(solicitud.params.id)
+          if (usuarioEncontrado._id) {
+            respuesta.json({
+              resultado: "bien",
+              mensaje: "usuario leído",
+              datos: usuarioEncontrado
+            });
+          }          
+        } catch (error) {
+        respuesta.json({
+          resultado: "mal",
+          mensaje: "ocurrió un error al leer usuario",
+          datos: error
+        });
+        }
+      },
+      leerUsuarios: async (solicitud, respuesta) => {
+        try {
+          const todosLosUsuarios = await ModeloUsuario.find();
+          respuesta.json({
+            resultado: "bien",
+            mensaje: "usuarios leídos",
+            datos: todosLosUsuarios
+          });
+        } catch (error) {
+          respuesta.json({
+            resultado: "mal",
+            mensaje: "ocurrió un error al leer todos los usuarios",
+            datos: error
+          });
+        }
+      },
+      actualizarUsuario: async (solicitud, respuesta) => {
+        try {
+          const usuarioActualizado =await ModeloUsuario.findByIdAndUpdate(
+            solicitud.params.id,
+            solicitud.body
+          );
+          if(usuarioActualizado._id){
+            respuesta.json({
+              resultado:"bien",
+              mensaje:"usuario actualizado",
+              datos:usuarioActualizado._id,
+            });
+          }
+    
+        } catch (error) {
+          respuesta.json({
+            resultado:"mal",
+            mensaje:"ocurrio un error al actualizar",
+            datos:error, 
+          });
       }
     },
-      leerUsuario: async (solicitud, respuesta) => {
-        try{
-            console.log(solicitud.params.id);
-        respuesta.json({mensaje: "GET usuario works!"});
-        }catch (error){
-            console.log("error:", error)
-            respuesta.json ({error:true, mensaje:"ocurrio un error al leer usuario"});
-
-        }
-    },
-      leerUsuarios: async (solicitud, respuesta) => {
-       try{
-        respuesta.json({mensaje: "GET  todos los usuarios works!"});
-       }catch (error){
-        console.log("error:", error)
-         respuesta.json ({error:true, mensaje:"ocurrio un error al leer todos los usuario"});
-
-       }
-    },
-      actualizarUsuario:async (solicitud, respuesta) => {
-        try{
-            console.log("id:",solicitud.params.solicitud);
-            console.log("solicitud:",solicitud.body);
-            respuesta.json({mensaje: "PUT usuario works!"});
-        }catch (error){
-            console.log("error:", error);
-            respuesta.json ({error:true, mensaje:"ocurrio un error al leer todos los usuario"});
-        }
-        },
-        eliminarUsuario: async (solicitud, respuesta) => {
+      eliminarUsuario: async (solicitud, respuesta) => {
         try {
-            console.log("id: ", solicitud.params.id);
-            respuesta.json({mensaje: "DELETE eliminar usuario...works!"});
-          } catch (error) {
-            console.log("error: ", error);
-            respuesta.json({error: true, mensaje: "ocurrió un error al eliminar usuario"});
-          }
+          const usuarioEliminado = await ModeloUsuario.findByIdAndDelete(solicitud.params.id)
+          if (usuarioEliminado._id) {
+            respuesta.json({
+              resultado: "bien",
+              mensaje: "usuario eliminado",
+              datos: null
+            });
+          }          
+        } catch (error) {
+        respuesta.json({
+          resultado: "mal",
+          mensaje: "ocurrió un error al eliminar usuario",
+          datos: error
+        });
         }
-    }
-      export default ControladorUsuarios; //exportamos el objeto en este caso es controladorUsuario y importarlo en rutaUsuario 
+      }
+}
+export default ControladorUsuarios; 
+      //exportamos el objeto en este caso es controladorUsuario y importarlo en rutaUsuario 
+  
       
-      /*
-      const usuario ={
-        nombre:"Deisy",
-        apellido:"esquivia",
-        edad:"36",
-        numero de identidad:"1068765434"
-        email: "deisyesquivia3@gmail.com",
-        contrasenia:"1234",
-        repetir contraseña:"1234",
-        dirección: "cordoba"
-        pais: "colombia"
-
-      }  notaaa hay que ir probando en postman
-      */
      
